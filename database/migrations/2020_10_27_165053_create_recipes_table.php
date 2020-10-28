@@ -34,7 +34,6 @@ class CreateRecipesTable extends Migration
             $table->string('name');
             $table->enum('difficulty', ['Super Simple', 'Fairly Easy', 'Average', 'Hard', 'Very Difficult']);
             $table->string('image_url');
-            $table->float('avg_rating', 8, 2);
             $table->text('steps');
             $table->timestamps();
         });
