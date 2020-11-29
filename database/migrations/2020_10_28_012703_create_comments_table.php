@@ -16,7 +16,7 @@ class CreateCommentsTable extends Migration
         Schema::dropIfExists('comment');
         Schema::create('comment', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_user')->references('id')->on('user');
+            $table->foreignId('id_user')->references('id')->on('users');
             $table->foreignId('id_recipe')->references('id')->on('recipe');
             $table->text('content');
             $table->timestamps();

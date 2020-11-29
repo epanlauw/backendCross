@@ -20,8 +20,8 @@ class CreateUsersTable extends Migration
             $table->text('description');
         });
 
-        Schema::dropIfExists('user');
-        Schema::create('user', function (Blueprint $table) {
+        Schema::dropIfExists('users');
+        Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_role')->references('id')->on('role');
             $table->string('email')->unique();
@@ -42,7 +42,7 @@ class CreateUsersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user');
+        Schema::dropIfExists('users');
         Schema::dropIfExists('role');
     }
 }

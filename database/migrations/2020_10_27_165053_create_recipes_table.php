@@ -49,7 +49,7 @@ class CreateRecipesTable extends Migration
         Schema::dropIfExists('rating');
         Schema::create('rating', function(Blueprint $table) {
             $table->foreignId('id_recipe')->references('id')->on('recipe');
-            $table->foreignId('id_user')->references('id')->on('user');
+            $table->foreignId('id_user')->references('id')->on('users');
                 $table->primary(['id_recipe', 'id_user']);
             $table->integer('rate');
         });
