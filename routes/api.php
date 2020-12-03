@@ -15,9 +15,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
+Route::middleware('auth:api')->group(function () {
     // our routes to be protected will go in here
-    Route::get('/logout', 'Auth\ApiAuthController@logout')->name('logout.api');
+    Route::post('/logout', 'Auth\ApiAuthController@logout')->name('logout.api');
 });
 
 Route::group(['middleware' => ['cors', 'json.response']], function() {
