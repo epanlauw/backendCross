@@ -33,8 +33,11 @@ class ApiAuthController extends Controller
         //     mkdir(public_path(). '/upload/users/', 0775, true);
         // }
 
-        $file = base64_decode($request['avatar_url']);
-        $safeName = rand(10000,120371). '.' . 'png';
+        $image_parts = explode(";base64,",$request['avatar_url']);
+        $image_type_aux = explode("image/", $image_parts[0]);
+        $image_type = $image_type_aux[1];
+        $file = base64_decode($image_parts[1]);
+        $safeName = rand(10000,120371). '.' . $image_type;
         Storage::disk('local')->put($safeName, $file);
         $request['avatar_url'] = $safeName;
 
@@ -80,7 +83,8 @@ class ApiAuthController extends Controller
     public function getDetails(Request $request) {
         $user = $request->user();
         $file = Storage::disk('local')->get($user['avatar_url']);
-        $user['avatar_url'] = base64_encode($file);
+        $type = pathinfo($user['avatar_url'], PATHINFO_EXTENSION);
+        $user['avatar_url'] = 'data:image/' . $type . ';base64,' . base64_encode($file);
         $response = ['success' => $user];
         return response($response, 200);
     }
