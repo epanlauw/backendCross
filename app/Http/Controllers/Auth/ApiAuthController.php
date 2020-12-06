@@ -28,11 +28,6 @@ class ApiAuthController extends Controller
             return response(['errors'=>$validator->errors()->all()],422);
         }
 
-        // if (!is_dir(public_path(). '/upload/users/')) {
-        //     // dir doesn't exist, make it
-        //     mkdir(public_path(). '/upload/users/', 0775, true);
-        // }
-
         $image_parts = explode(";base64,",$request['avatar_url']);
         $image_type_aux = explode("image/", $image_parts[0]);
         $image_type = $image_type_aux[1];
