@@ -8,6 +8,7 @@ use App\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class ApiAuthController extends Controller
 {
@@ -20,12 +21,20 @@ class ApiAuthController extends Controller
             'password' => 'required|string|min:6',
             'date_of_birth' => 'required|date',
             'gender' => 'in:Male,Female',
-            'avatar_url' => 'string|max:255'
+            'avatar_url' => 'string'
         ]);
 
         if($validator->fails()) {
             return response(['errors'=>$validator->errors()->all()],422);
         }
+
+        $image_parts = explode(";base64,",$request['avatar_url']);
+        $image_type_aux = explode("image/", $image_parts[0]);
+        $image_type = $image_type_aux[1];
+        $file = base64_decode($image_parts[1]);
+        $safeName = rand(10000,120371). '.' . $image_type;
+        Storage::disk('local')->put($safeName, $file);
+        $request['avatar_url'] = $safeName;
 
         $request['password']=Hash::make($request['password']);
         $user = User::create($request->toArray());
@@ -63,6 +72,15 @@ class ApiAuthController extends Controller
         $token = $request->user()->token();
         $token->revoke();
         $response = ['message' => 'You have been successfully logged out!'];
+        return response($response, 200);
+    }
+
+    public function getDetails(Request $request) {
+        $user = $request->user();
+        $file = Storage::disk('local')->get($user['avatar_url']);
+        $type = pathinfo($user['avatar_url'], PATHINFO_EXTENSION);
+        $user['avatar_url'] = 'data:image/' . $type . ';base64,' . base64_encode($file);
+        $response = ['success' => $user];
         return response($response, 200);
     }
 }
