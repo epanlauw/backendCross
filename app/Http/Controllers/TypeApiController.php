@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Type;
 
-class TypeApiController extends Controller
+class TypeApiController extends BaseController
 {
     public function create (Request $request) {
         $validator = Validator::make($request->all(), [
@@ -15,10 +16,13 @@ class TypeApiController extends Controller
         ]);
 
         if($validator->fails()) {
-            return response(['errors' => $validator->errors()->all()], 422);
+            return $this->sendError("Validation Error.", $validator->errors(), 422);
         }
 
         $type = Type::create($request->toArray());
-        return response("Type created", 200);
+
+        $success['type'] = $type;
+        
+        return $this->sendResponse($success, "Type created successfully.");
     }
 }
