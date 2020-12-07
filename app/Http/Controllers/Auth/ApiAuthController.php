@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
 use App\User;
 use Illuminate\Support\Facades\Hash;
@@ -10,24 +10,25 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
-class ApiAuthController extends Controller
+class ApiAuthController extends BaseController
 {
     // register
     public function register(Request $request) {
         $validator = Validator::make($request->all(), [
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6',
+            'first_name'    => 'required|string|max:255',
+            'last_name'     => 'string|max:255',
+            'email'         => 'required|string|email|max:255|unique:users',
+            'password'      => 'required|string|min:6',
             'date_of_birth' => 'required|date',
-            'gender' => 'in:Male,Female',
-            'avatar_url' => 'string'
+            'gender'        => 'in:Male,Female',
+            'avatar_url'    => 'string'
         ]);
 
         if($validator->fails()) {
-            return response(['errors'=>$validator->errors()->all()],422);
+            return $this->sendError("Validation Error.", $validator->errors(), 422);
         }
 
+        // TODO: Refactor this to be more readable
         $image_parts = explode(";base64,",$request['avatar_url']);
         $image_type_aux = explode("image/", $image_parts[0]);
         $image_type = $image_type_aux[1];
@@ -38,41 +39,50 @@ class ApiAuthController extends Controller
 
         $request['password']=Hash::make($request['password']);
         $user = User::create($request->toArray());
-        $token = $user->createToken('Laravel Password Grant Client')->accessToken;
-        $response = ['token' => $token];
-        return response($response, 200);
+
+        $success = [
+            'token' => $user->createToken('Laravel Password Grant Client')->accessToken,
+            'name'  => $user->first_name . ' ' . $user->last_name
+        ];
+
+        return $this->sendResponse($success, "User created successfully.");
     }
 
     public function login(Request $request) {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|string|email|max:255',
-            'password' => 'required|string|min:6'
+            'email'     => 'required|string|email|max:255',
+            'password'  => 'required|string|min:6'
         ]);
         
         if($validator->fails()) {
-            return response(['errors'=>$validator->errors()->all()],422);
+            return $this->sendError("Validation Error.", $validator->errors(), 422);
         }
+
         $user = User::where('email', $request->email)->first();
+
         if($user) {
             if(Hash::check($request->password, $user->password)) {
-                $token = $user->createToken('Laravel Password Grant Client')->accessToken;
-                $response = ['token' => $token];
-                return response($response, 200);
+                $success['token'] = $user->createToken('Laravel Password Grant Client')->accessToken;
+                return $this->sendResponse($success, "User login successfully.");
             } else {
-                $response = ["message" => "Password mismatch"];
-                return response($response, 422);
+                return $this->sendError("Login Error.", ["Password mismatch."], 422);
             }
         } else {
-            $response = ["message" => 'User does not exist'];
-            return response($response, 422);
+            return $this->sendError("Login Error.", ["User does not exist."], 422);
         }
     }
 
     public function logout(Request $request) {
         $token = $request->user()->token();
-        $token->revoke();
-        $response = ['message' => 'You have been successfully logged out!'];
-        return response($response, 200);
+        $revoke_token = $token->revoke();
+
+        if(!$revoke_token) {
+            return $this->sendError("Logout Error.", ["Failed to log out."], 422);
+        }
+
+        $success['token_revoked'] = $revoke_token;
+        
+        return $this->sendResponse($success, "Successfully logged out.");
     }
 
     public function getDetails(Request $request) {
@@ -80,7 +90,9 @@ class ApiAuthController extends Controller
         $file = Storage::disk('local')->get($user['avatar_url']);
         $type = pathinfo($user['avatar_url'], PATHINFO_EXTENSION);
         $user['avatar_url'] = 'data:image/' . $type . ';base64,' . base64_encode($file);
-        $response = ['success' => $user];
-        return response($response, 200);
+        
+        $success['user'] = $user;
+
+        return $this->sendResponse($success, "User details received successfully.");
     }
 }
