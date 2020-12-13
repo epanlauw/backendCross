@@ -20,6 +20,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/detail_profile','Auth\ApiAuthController@getDetails')->name('detail.api');
     Route::post('/add_type','TypeApiController@create')->name('type.create');
     Route::get('/logout', 'Auth\ApiAuthController@logout')->name('logout.api');
+    
 });
 
 Route::group(['middleware' => ['cors', 'json.response']], function() {
