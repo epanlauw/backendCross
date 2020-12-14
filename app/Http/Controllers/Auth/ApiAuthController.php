@@ -34,7 +34,7 @@ class ApiAuthController extends BaseController
         $image_type = $image_type_aux[1];
         $file = base64_decode($image_parts[1]);
         $safeName = rand(10000,120371). '.' . $image_type;
-        Storage::disk('local')->put($safeName, $file);
+        Storage::disk('s3')->put($safeName, $file);
         $request['avatar_url'] = $safeName;
 
         $request['password']=Hash::make($request['password']);
@@ -87,7 +87,7 @@ class ApiAuthController extends BaseController
 
     public function getDetails(Request $request) {
         $user = $request->user();
-        $file = Storage::disk('local')->get($user['avatar_url']);
+        $file = Storage::disk('s3')->get($user['avatar_url']);
         $type = pathinfo($user['avatar_url'], PATHINFO_EXTENSION);
         $user['avatar_url'] = 'data:image/' . $type . ';base64,' . base64_encode($file);
         
