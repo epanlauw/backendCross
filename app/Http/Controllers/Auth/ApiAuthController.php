@@ -95,4 +95,47 @@ class ApiAuthController extends BaseController
 
         return $this->sendResponse($success, "User details received successfully.");
     }
+
+    public function editUsers(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'first_name'    => 'required|string|max:255',
+            'last_name'     => 'max:255',
+            'email'         => 'required|string|email|max:255|unique:users',
+            'password'      => 'required|string|min:6',
+            'date_of_birth' => 'required|date',
+            'gender'        => 'in:Male,Female',
+            'avatar_url'    => 'string'
+        ]);
+
+        if($validator->fails()) {
+            return $this->sendError("Validation Error.", $validator->errors(), 422);
+        }
+
+
+        $user = $request->user();
+        $user['first_name'] = $request->first_name;
+        $user['last_name'] = $request->last_name;
+        $user['email'] = $request->email;
+        $user['password'] = Hash::make($request->password);
+        $user['date_of_birth'] = $request->date_of_birth;
+        $user['gender'] = $request->gender;
+
+        $file = $user['avatar_url'];
+
+        if (Storage::disk('s3')->exists($file)) {
+            Storage::disk('s3')->delete($file);
+        }
+        $image_parts = explode(";base64,",$request['avatar_url']);
+        $image_type_aux = explode("image/", $image_parts[0]);
+        $image_type = $image_type_aux[1];
+        $file = base64_decode($image_parts[1]);
+        $safeName = rand(10000,120371). '.' . $image_type;
+        Storage::disk('s3')->put($safeName, $file);
+        $user['avatar_url'] = $safeName;
+
+        $user->save();
+
+        $success['user'] = $user;
+        return $this->sendResponse($success, "User successfully update.");
+    }
 }

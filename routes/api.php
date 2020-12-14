@@ -17,9 +17,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:api')->group(function () {
     // our routes to be protected will go in here
+
+    //user
     Route::get('/detail_profile','Auth\ApiAuthController@getDetails')->name('detail.api');
-    Route::post('/add_type','TypeApiController@create')->name('type.create');
     Route::get('/logout', 'Auth\ApiAuthController@logout')->name('logout.api');
+    Route::put('/edit_profile','Auth\ApiAuthController@editUsers')->name('editprofile.api');
+
+    Route::post('/add_type','TypeApiController@create')->name('type.create');
     
 });
 
