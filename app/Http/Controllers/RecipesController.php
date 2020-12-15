@@ -44,6 +44,7 @@ class RecipesController extends BaseController
             'difficulty' => 'in:"Super Simple","Fairly Easy", "Average", "Hard", "Very Difficult"',
             'image_url' => 'required|string',
             'steps' => 'required|string',
+            'ingredient' => 'required|string'
         ]);
 
         if($validator->fails()) {
@@ -111,6 +112,7 @@ class RecipesController extends BaseController
             'difficulty' => 'in:"Super Simple","Fairly Easy", "Average", "Hard", "Very Difficult"',
             'image_url' => 'required|string',
             'steps' => 'required|string',
+            'ingredient' => 'required|string'
         ]);
 
         if($validator->fails()) {
@@ -120,6 +122,7 @@ class RecipesController extends BaseController
         $recipe['name'] = $request->name;
         $recipe['difficulty'] = $request->difficulty;
         $recipe['steps'] = $request->steps;
+        $recipe['ingredient'] = $request->ingredient;
         
         
         if (Storage::disk('s3')->exists('recipe_images/' . $recipe['image_url'])) {
