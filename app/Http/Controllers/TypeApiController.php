@@ -9,6 +9,12 @@ use App\Type;
 
 class TypeApiController extends BaseController
 {
+    public function index(Request $request) {
+        $type = Type::all();
+        $success['type'] = $type;
+        return $this->sendResponse($success, "Show all types");
+    }
+
     public function create (Request $request) {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
