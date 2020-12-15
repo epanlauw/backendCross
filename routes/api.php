@@ -25,6 +25,7 @@ Route::middleware('auth:api')->group(function () {
 
     //type
     Route::post('/add_type','TypeApiController@create')->name('type.create');
+    Route::get('type','TypeApiController@index')->name('type.api');
 
     //recipe
     Route::post('/add_recipe','RecipesController@create')->name('recipe.create');
