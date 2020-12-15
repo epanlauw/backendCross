@@ -23,8 +23,16 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/logout', 'Auth\ApiAuthController@logout')->name('logout.api');
     Route::put('/edit_profile','Auth\ApiAuthController@editUsers')->name('editprofile.api');
 
+    //type
     Route::post('/add_type','TypeApiController@create')->name('type.create');
-    
+
+    //recipe
+    Route::post('/add_recipe','RecipesController@create')->name('recipe.create');
+    Route::get('/recipe','RecipesController@index')->name('recipe.all');
+    Route::get('/recipe/{id}','RecipesController@show')->name('recipe.detail');
+    Route::put('/recipe/{id}','RecipesController@edit')->name('recipe.edit');
+    Route::delete('/recipe/{id}','RecipesController@destroy')->name('recipe.delete');
+
 });
 
 Route::group(['middleware' => ['cors', 'json.response']], function() {
