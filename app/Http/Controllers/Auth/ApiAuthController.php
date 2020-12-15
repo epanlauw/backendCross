@@ -100,7 +100,6 @@ class ApiAuthController extends BaseController
         $validator = Validator::make($request->all(), [
             'first_name'    => 'required|string|max:255',
             'last_name'     => 'max:255',
-            'password'      => 'required|string|min:6',
             'date_of_birth' => 'required|date',
             'gender'        => 'in:Male,Female',
             'avatar_url'    => 'string'
@@ -114,7 +113,6 @@ class ApiAuthController extends BaseController
         $user = $request->user();
         $user['first_name'] = $request->first_name;
         $user['last_name'] = $request->last_name;
-        $user['password'] = Hash::make($request->password);
         $user['date_of_birth'] = $request->date_of_birth;
         $user['gender'] = $request->gender;
 
