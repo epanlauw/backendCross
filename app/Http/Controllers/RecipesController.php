@@ -117,6 +117,7 @@ class RecipesController extends BaseController
             $recipe['image_url'] = 'data:image/' . $type . ';base64,' . base64_encode($file);
         }
 
+        $success['length'] = count($recipes);
         $success['recipes'] = $recipes;
 
         return $this->sendResponse($success, "Show recipes by type.");
