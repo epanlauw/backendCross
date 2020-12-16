@@ -97,6 +97,33 @@ class RecipesController extends BaseController
     }
 
     /**
+     * Show recipe by type
+     * 
+     * @param \Illuminate\Http\Request  $request
+     * @param $id_type
+     * @return \Illuminate\Http\Response
+     */
+    public function showByType(Request $request, $id_type) {
+        $query = Recipe::where('id_type', $id_type);
+        $recipes = $query->get();
+
+        if(count($recipes) == 0) {
+            return $this->sendError("Not Found.", ["Probably type doesn't exist"], 404);
+        }
+
+        foreach($recipes as $recipe) {
+            $file = Storage::disk('s3')->get('recipe_images/' . $recipe['image_url']);
+            $type = pathinfo($recipe['image_url'], PATHINFO_EXTENSION);
+            $recipe['image_url'] = 'data:image/' . $type . ';base64,' . base64_encode($file);
+        }
+
+        $success['recipes'] = $recipes;
+
+        return $this->sendResponse($success, "Show recipes by type.");
+
+    }
+
+    /**
      * Show the form for editing the specified resource.
      *
      * @param  \App\Recipe  $recipe

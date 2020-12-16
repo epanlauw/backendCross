@@ -31,6 +31,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/add_recipe','RecipesController@create')->name('recipe.create');
     Route::get('/recipe','RecipesController@index')->name('recipe.all');
     Route::get('/recipe/{id}','RecipesController@show')->name('recipe.detail');
+    Route::get('/recipe/type/{id_type}', 'RecipesController@showByType')->name('recipe.type');
     Route::put('/recipe/{id}','RecipesController@edit')->name('recipe.edit');
     Route::delete('/recipe/{id}','RecipesController@destroy')->name('recipe.delete');
 
